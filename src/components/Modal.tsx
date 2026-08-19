@@ -2,11 +2,11 @@
 
 type ModalProps = {
   title: string;
-  onClose: () => void;
+  onCloseAction: () => void;
   children: React.ReactNode;
 };
 
-export function Modal({ title, onClose, children }: ModalProps) {
+export function Modal({ title, onCloseAction, children }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div
@@ -18,7 +18,7 @@ export function Modal({ title, onClose, children }: ModalProps) {
           <h2 className="text-xl font-semibold text-[#27313A]">{title}</h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={onCloseAction}
             className="text-2xl leading-none text-gray-500 hover:text-black"
             aria-label="Fechar"
           >

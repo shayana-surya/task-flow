@@ -15,7 +15,7 @@ export default async function Home() {
   const state = dehydrate(queryClient);
 
   return (
-    <main className="min-h-screen p-8 max-w-2xl mx-auto">
+    <main className="min-h-screen w-full px-4 py-6 sm:px-8 sm:py-8">
       <HydrateClient state={state}>
         <TaskBoard />
       </HydrateClient>

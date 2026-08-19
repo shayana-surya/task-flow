@@ -8,47 +8,37 @@ function useTaskUtils() {
   return { utils, notify };
 }
 
-export function useCreateTask() {
+function useTaskMutationFeedback(
+  successMessage: string,
+  errorPrefix: string
+) {
   const { utils, notify } = useTaskUtils();
-  const createTask = trpc.task.create.useMutation({
+
+  return {
     onSuccess: () => {
       utils.task.list.invalidate();
-      notify({ type: "success", message: "Tarefa criada com sucesso." });
+      notify({ type: "success", message: successMessage });
     },
-    onError: (error) => {
-      notify({ type: "error", message: `Erro ao criar tarefa: ${error.message}` });
+    onError: (error: { message: string }) => {
+      notify({ type: "error", message: `${errorPrefix}: ${error.message}` });
     },
-  });
+  };
+}
 
-  return createTask;
+export function useCreateTask() {
+  return trpc.task.create.useMutation(
+    useTaskMutationFeedback("Tarefa criada com sucesso.", "Erro ao criar tarefa")
+  );
 }
 
 export function useUpdateTask() {
-  const { utils, notify } = useTaskUtils();
-  const updateTask = trpc.task.update.useMutation({
-    onSuccess: () => {
-      utils.task.list.invalidate();
-      notify({ type: "success", message: "Tarefa atualizada com sucesso." });
-    },
-    onError: (error) => {
-      notify({ type: "error", message: `Erro ao atualizar: ${error.message}` });
-    },
-  });
-
-  return updateTask;
+  return trpc.task.update.useMutation(
+    useTaskMutationFeedback("Tarefa atualizada com sucesso.", "Erro ao atualizar")
+  );
 }
 
 export function useDeleteTask() {
-  const { utils, notify } = useTaskUtils();
-  const deleteTask = trpc.task.delete.useMutation({
-    onSuccess: () => {
-      utils.task.list.invalidate();
-      notify({ type: "success", message: "Tarefa excluída com sucesso." });
-    },
-    onError: (error) => {
-      notify({ type: "error", message: `Erro ao excluir: ${error.message}` });
-    },
-  });
-
-  return deleteTask;
+  return trpc.task.delete.useMutation(
+    useTaskMutationFeedback("Tarefa excluída com sucesso.", "Erro ao excluir")
+  );
 }

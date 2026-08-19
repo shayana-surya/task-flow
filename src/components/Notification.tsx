@@ -4,7 +4,9 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -33,15 +35,37 @@ export function NotificationProvider({
   children: React.ReactNode;
 }) {
   const [notification, setNotification] = useState<Notification | null>(null);
+  const timeoutRef = useRef<number | null>(null);
 
   const notify = useCallback((nextNotification: Notification) => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+    }
+
     setNotification(nextNotification);
 
-    window.setTimeout(() => {
+    timeoutRef.current = window.setTimeout(() => {
       setNotification((current) =>
         current === nextNotification ? null : current
       );
     }, 4000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
+  const dismiss = useCallback(() => {
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    setNotification(null);
   }, []);
 
   const contextValue = useMemo(() => ({ notify }), [notify]);
@@ -59,7 +83,7 @@ export function NotificationProvider({
             <span>{notification.message}</span>
             <button
               type="button"
-              onClick={() => setNotification(null)}
+              onClick={dismiss}
               className="text-xl leading-none text-white/80 hover:text-white"
               aria-label="Fechar mensagem"
             >

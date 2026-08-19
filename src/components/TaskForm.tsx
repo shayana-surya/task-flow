@@ -6,10 +6,10 @@ import { Modal } from "./Modal";
 import { useNotification } from "./Notification";
 
 type TaskFormProps = {
-  onClose: () => void;
+  onCloseAction: () => void;
 };
 
-export function TaskForm({ onClose }: TaskFormProps) {
+export function TaskForm({ onCloseAction }: TaskFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -33,14 +33,14 @@ export function TaskForm({ onClose }: TaskFormProps) {
         onSuccess: () => {
           setTitle("");
           setDescription("");
-          onClose();
+          onCloseAction();
         },
       }
     );
   }
 
   return (
-    <Modal title="Nova tarefa" onClose={onClose}>
+    <Modal title="Nova tarefa" onCloseAction={onCloseAction}>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col gap-4"
@@ -64,7 +64,7 @@ export function TaskForm({ onClose }: TaskFormProps) {
         <div className="flex justify-end gap-2">
           <button
             type="button"
-            onClick={onClose}
+            onClick={onCloseAction}
             className="border rounded-lg px-4 py-2"
           >
             Cancelar

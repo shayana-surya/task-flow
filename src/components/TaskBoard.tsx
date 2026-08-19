@@ -24,7 +24,7 @@ export function TaskBoard() {
 
       {isCreateOpen && (
         <TaskForm
-          onClose={() => setIsCreateOpen(false)}
+          onCloseAction={() => setIsCreateOpen(false)}
         />
       )}
 

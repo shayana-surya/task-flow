@@ -4,7 +4,6 @@ import type {
   TaskRepository,
   UpdateTaskData,
 } from "../domain/task";
-import { taskRepository } from "../infrastructure/in-memory-task-repository";
 
 export class TaskService {
   constructor(private readonly repository: TaskRepository) {}
@@ -33,5 +32,3 @@ export class TaskService {
     return { success: true };
   }
 }
-
-export const taskService = new TaskService(taskRepository);

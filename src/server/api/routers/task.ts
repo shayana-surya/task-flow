@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, publicProcedure } from "../trpc";
-import { taskService } from "../../application/task-service";
+import { taskService } from "../../composition/task-dependencies";
 
 export const taskRouter = router({
   list: publicProcedure.query(() => {

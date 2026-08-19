@@ -2,7 +2,7 @@
 
 import type { AppRouter } from "@/server/api/root";
 import type { inferRouterOutputs } from "@trpc/server";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useDeleteTask,
   useUpdateTask,
@@ -26,6 +26,13 @@ export function TaskItem({ task }: TaskItemProps) {
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
   const { notify } = useNotification();
+
+  useEffect(() => {
+    if (!isEditing) {
+      setTitle(task.title);
+      setDescription(task.description ?? "");
+    }
+  }, [isEditing, task.title, task.description]);
 
   function handleUpdate(event: React.FormEvent) {
     event.preventDefault();
@@ -85,7 +92,7 @@ export function TaskItem({ task }: TaskItemProps) {
       </article>
 
       {isEditing && (
-        <Modal title="Editar tarefa" onClose={() => setIsEditing(false)}>
+        <Modal title="Editar tarefa" onCloseAction={() => setIsEditing(false)}>
           <form onSubmit={handleUpdate} className="flex flex-col gap-4">
             <input
               type="text"
@@ -123,8 +130,8 @@ export function TaskItem({ task }: TaskItemProps) {
       {isDeleteOpen && (
         <TaskDeleteModal
           taskTitle={task.title}
-          onCancel={() => setIsDeleteOpen(false)}
-          onConfirm={handleConfirmDelete}
+          onCancelAction={() => setIsDeleteOpen(false)}
+          onConfirmAction={handleConfirmDelete}
         />
       )}
     </>
