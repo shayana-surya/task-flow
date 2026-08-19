@@ -8,7 +8,7 @@ type Task = {
   createdAt: Date;
 };
 
-let tasks: Task[] = [
+const tasks: Task[] = [
   {
     id: 1,
     title: "Criar Task Manager",
@@ -34,7 +34,7 @@ export const taskRouter = router({
       const task: Task = {
         id: nextId++,
         title: input.title,
-        description: input.description ?? "",
+        description: input.description,
         createdAt: new Date(),
       };
 
