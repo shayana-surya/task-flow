@@ -1,28 +1,24 @@
-import { TaskForm } from "@/components/TaskForm";
-import { TaskList } from "@/components/TaskList";
+import { dehydrate } from "@tanstack/react-query";
+import { TaskBoard } from "@/components/TaskBoard";
+import { trpc, getQueryClient } from "@/trpc/server";
+import { HydrateClient } from "@/trpc/hydrate-client";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchQuery(
+    trpc.task.list.queryOptions()
+  );
+
+  const state = dehydrate(queryClient);
+
   return (
     <main className="min-h-screen p-8 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-8">
-        Task Flow
-      </h1>
-
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">
-          Nova tarefa
-        </h2>
-
-        <TaskForm />
-      </section>
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4">
-          Minhas tarefas
-        </h2>
-
-        <TaskList />
-      </section>
+      <HydrateClient state={state}>
+        <TaskBoard />
+      </HydrateClient>
     </main>
   );
 }
