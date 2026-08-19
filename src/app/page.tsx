@@ -1,47 +1,28 @@
-"use client";
-
-import { trpc } from "@/utils/trpc";
+import { TaskForm } from "@/components/TaskForm";
+import { TaskList } from "@/components/TaskList";
 
 export default function Home() {
-  const { data: tasks, isLoading, error } = trpc.task.list.useQuery();
-
-  if (isLoading) {
-    return <div>Carregando tarefas...</div>;
-  }
-
-  if (error) {
-    return <div>Erro ao carregar tarefas: {error.message}</div>;
-  }
-
   return (
-    <main className="min-h-screen p-8">
-      <h1 className="text-3xl font-bold mb-6">
+    <main className="min-h-screen p-8 max-w-2xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8">
         Task Flow
       </h1>
 
-      <div className="flex flex-col gap-4">
-        {tasks?.map((task) => (
-          <div
-            key={task.id}
-            className="border rounded-lg p-4"
-          >
-            <h2 className="text-xl font-semibold">
-              {task.title}
-            </h2>
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold mb-4">
+          Nova tarefa
+        </h2>
 
-            {task.description && (
-              <p className="text-gray-600 mt-2">
-                {task.description}
-              </p>
-            )}
+        <TaskForm />
+      </section>
 
-            <p className="text-sm text-gray-400 mt-2">
-              Criada em:{" "}
-              {new Date(task.createdAt).toLocaleDateString("pt-BR")}
-            </p>
-          </div>
-        ))}
-      </div>
+      <section>
+        <h2 className="text-xl font-semibold mb-4">
+          Minhas tarefas
+        </h2>
+
+        <TaskList />
+      </section>
     </main>
   );
 }
