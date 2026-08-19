@@ -1,66 +1,83 @@
 "use client";
 
 import { useState } from "react";
-import { trpc } from "@/utils/trpc";
+import { useCreateTask } from "@/hooks/use-task-mutations";
+import { Modal } from "./Modal";
+import { useNotification } from "./Notification";
 
-export function TaskForm() {
+type TaskFormProps = {
+  onClose: () => void;
+};
+
+export function TaskForm({ onClose }: TaskFormProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
-  const utils = trpc.useUtils();
-
-  const createTask = trpc.task.create.useMutation({
-    onSuccess: () => {
-      setTitle("");
-      setDescription("");
-
-      utils.task.list.invalidate();
-    },
-  });
+  const createTask = useCreateTask();
+  const { notify } = useNotification();
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     if (!title.trim()) {
+      notify({ type: "warning", message: "Informe um título para a tarefa." });
       return;
     }
 
-    createTask.mutate({
-      title: title.trim(),
-      description: description.trim() || undefined,
-    });
+    createTask.mutate(
+      {
+        title: title.trim(),
+        description: description.trim() || undefined,
+      },
+      {
+        onSuccess: () => {
+          setTitle("");
+          setDescription("");
+          onClose();
+        },
+      }
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <input
-        type="text"
-        placeholder="Título da tarefa"
-        value={title}
-        onChange={(event) => setTitle(event.target.value)}
-        className="border rounded-lg p-3"
-      />
-
-      <textarea
-        placeholder="Descrição (opcional)"
-        value={description}
-        onChange={(event) => setDescription(event.target.value)}
-        className="border rounded-lg p-3"
-      />
-
-      <button
-        type="submit"
-        disabled={createTask.isPending}
-        className="bg-black text-white rounded-lg p-3 disabled:opacity-50"
+    <Modal title="Nova tarefa" onClose={onClose}>
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
       >
-        {createTask.isPending ? "Criando..." : "Criar tarefa"}
-      </button>
+        <input
+          type="text"
+          placeholder="Título da tarefa"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          className="border rounded-lg p-3"
+          autoFocus
+        />
 
-      {createTask.error && (
-        <p className="text-red-500">
-          Erro ao criar tarefa: {createTask.error.message}
-        </p>
-      )}
-    </form>
+        <textarea
+          placeholder="Descrição (opcional)"
+          value={description}
+          onChange={(event) => setDescription(event.target.value)}
+          className="border rounded-lg p-3"
+        />
+
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="border rounded-lg px-4 py-2"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={createTask.isPending}
+            className="bg-black text-white rounded-lg px-4 py-2 disabled:opacity-50"
+          >
+            {createTask.isPending ? "Criando..." : "Criar tarefa"}
+          </button>
+        </div>
+      </form>
+    </Modal>
   );
 }

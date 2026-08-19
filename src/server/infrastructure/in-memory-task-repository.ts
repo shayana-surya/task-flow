@@ -18,7 +18,7 @@ export class InMemoryTaskRepository implements TaskRepository {
   private nextId = 2;
 
   list() {
-    return this.tasks;
+    return this.tasks.map((task) => ({ ...task }));
   }
 
   create(data: CreateTaskData) {
@@ -30,7 +30,7 @@ export class InMemoryTaskRepository implements TaskRepository {
     };
 
     this.tasks.push(task);
-    return task;
+    return { ...task };
   }
 
   update(data: UpdateTaskData) {
@@ -42,7 +42,7 @@ export class InMemoryTaskRepository implements TaskRepository {
 
     task.title = data.title;
     task.description = data.description;
-    return task;
+    return { ...task };
   }
 
   delete(id: number) {
@@ -56,4 +56,14 @@ export class InMemoryTaskRepository implements TaskRepository {
   }
 }
 
-export const taskRepository = new InMemoryTaskRepository();
+const repositoryKey = Symbol.for("task-flow.in-memory-task-repository");
+type RepositoryGlobal = typeof globalThis & {
+  [repositoryKey]?: InMemoryTaskRepository;
+};
+
+const globalRepository = globalThis as RepositoryGlobal;
+
+export const taskRepository =
+  globalRepository[repositoryKey] ?? new InMemoryTaskRepository();
+
+globalRepository[repositoryKey] = taskRepository;

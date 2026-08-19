@@ -2,8 +2,14 @@
 
 import type { AppRouter } from "@/server/api/root";
 import type { inferRouterOutputs } from "@trpc/server";
-import { trpc } from "@/utils/trpc";
 import { useState } from "react";
+import {
+  useDeleteTask,
+  useUpdateTask,
+} from "@/hooks/use-task-mutations";
+import { useNotification } from "./Notification";
+import { Modal } from "./Modal";
+import { TaskDeleteModal } from "./TaskDeleteModal";
 
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type Task = RouterOutput["task"]["list"][number];
@@ -14,143 +20,113 @@ type TaskItemProps = {
 
 export function TaskItem({ task }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [title, setTitle] = useState(task.title);
-  const [description, setDescription] = useState(
-    task.description ?? ""
-  );
-
-  const utils = trpc.useUtils();
-
-  const deleteTask = trpc.task.delete.useMutation({
-    onSuccess: () => {
-      utils.task.list.invalidate();
-    },
-  });
-
-  const updateTask = trpc.task.update.useMutation({
-    onSuccess: () => {
-      setIsEditing(false);
-      utils.task.list.invalidate();
-    },
-  });
-
-  function handleDelete() {
-    const confirmed = window.confirm(
-      `Deseja excluir a tarefa "${task.title}"?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    deleteTask.mutate({
-      id: task.id,
-    });
-  }
+  const [description, setDescription] = useState(task.description ?? "");
+  const updateTask = useUpdateTask();
+  const deleteTask = useDeleteTask();
+  const { notify } = useNotification();
 
   function handleUpdate(event: React.FormEvent) {
     event.preventDefault();
 
     if (!title.trim()) {
+      notify({ type: "warning", message: "Informe um título para a tarefa." });
       return;
     }
 
-    updateTask.mutate({
-      id: task.id,
-      title: title.trim(),
-      description: description.trim() || undefined,
-    });
-  }
-
-  if (isEditing) {
-    return (
-      <form
-        onSubmit={handleUpdate}
-        className="border rounded-lg p-4 flex flex-col gap-4"
-      >
-        <input
-          type="text"
-          value={title}
-          onChange={(event) => setTitle(event.target.value)}
-          className="border rounded-lg p-3"
-        />
-
-        <textarea
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          className="border rounded-lg p-3"
-          placeholder="Descrição (opcional)"
-        />
-
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={updateTask.isPending}
-            className="border rounded px-3 py-1 disabled:opacity-50"
-          >
-            {updateTask.isPending ? "Salvando..." : "Salvar"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsEditing(false)}
-            className="border rounded px-3 py-1"
-          >
-            Cancelar
-          </button>
-        </div>
-
-        {updateTask.error && (
-            <p className="text-red-500">
-                Erro ao atualizar: {updateTask.error.message}
-            </p>
-        )}
-
-      </form>
+    updateTask.mutate(
+      {
+        id: task.id,
+        title: title.trim(),
+        description: description.trim() || undefined,
+      },
+      {
+        onSuccess: () => setIsEditing(false),
+      }
     );
   }
 
+  function handleConfirmDelete() {
+    setIsDeleteOpen(false);
+    deleteTask.mutate({ id: task.id });
+  }
+
   return (
-    <div className="border rounded-lg p-4">
-      <h3 className="text-lg font-semibold">
-        {task.title}
-      </h3>
+    <>
+      <article className="rounded-xl border border-[#D9D3CC] bg-white p-4 shadow-sm">
+        <h3 className="text-lg font-semibold">{task.title}</h3>
 
-      {task.description && (
-        <p className="text-gray-600 mt-2">
-          {task.description}
+        {task.description && (
+          <p className="mt-2 text-gray-600">{task.description}</p>
+        )}
+
+        <p className="mt-2 text-sm text-gray-400">
+          Criada em: {new Date(task.createdAt).toLocaleDateString("pt-BR")}
         </p>
+
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            className="rounded-lg border border-[#7198B5] px-3 py-1 text-[#587B96] hover:bg-[#F7F5F2]"
+          >
+            Editar
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsDeleteOpen(true)}
+            disabled={deleteTask.isPending}
+            className="rounded-lg border border-[#E88A9B] px-3 py-1 text-[#C96B7D] hover:bg-[#FFF1F3] disabled:opacity-50"
+          >
+            {deleteTask.isPending ? "Excluindo..." : "Excluir"}
+          </button>
+        </div>
+      </article>
+
+      {isEditing && (
+        <Modal title="Editar tarefa" onClose={() => setIsEditing(false)}>
+          <form onSubmit={handleUpdate} className="flex flex-col gap-4">
+            <input
+              type="text"
+              value={title}
+              onChange={(event) => setTitle(event.target.value)}
+              className="rounded-lg border p-3"
+              autoFocus
+            />
+            <textarea
+              value={description}
+              onChange={(event) => setDescription(event.target.value)}
+              className="rounded-lg border p-3"
+              placeholder="Descrição (opcional)"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="rounded-lg border px-4 py-2"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                disabled={updateTask.isPending}
+                className="rounded-lg bg-black px-4 py-2 text-white disabled:opacity-50"
+              >
+                {updateTask.isPending ? "Salvando..." : "Salvar"}
+              </button>
+            </div>
+          </form>
+        </Modal>
       )}
 
-      <p className="text-sm text-gray-400 mt-2">
-        Criada em:{" "}
-        {new Date(task.createdAt).toLocaleDateString("pt-BR")}
-      </p>
-
-      {deleteTask.error && (
-        <p className="text-red-500 mt-2">
-            Erro ao excluir: {deleteTask.error.message}
-        </p>
+      {isDeleteOpen && (
+        <TaskDeleteModal
+          taskTitle={task.title}
+          onCancel={() => setIsDeleteOpen(false)}
+          onConfirm={handleConfirmDelete}
+        />
       )}
-
-      <div className="flex gap-2 mt-4">
-        <button
-          type="button"
-          onClick={() => setIsEditing(true)}
-          className="border rounded px-3 py-1"
-        >
-          Editar
-        </button>
-
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={deleteTask.isPending}
-          className="border rounded px-3 py-1 disabled:opacity-50"
-        >
-          {deleteTask.isPending ? "Excluindo..." : "Excluir"}
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

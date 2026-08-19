@@ -1,10 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import { trpc } from "@/utils/trpc";
-import { TaskItem } from "./TaskItem";
+import { TaskItem } from "@/components/TaskItem";
+import { useNotification } from "./Notification";
 
 export function TaskList() {
+  const { notify } = useNotification();
   const { data: tasks, isLoading, error } = trpc.task.list.useQuery();
+
+  useEffect(() => {
+    if (error) {
+      notify({
+        type: "error",
+        message: `Erro ao carregar tarefas: ${error.message}`,
+      });
+    }
+  }, [error, notify]);
 
   if (isLoading) {
     return <p>Carregando tarefas...</p>;
@@ -12,9 +24,7 @@ export function TaskList() {
 
   if (error) {
     return (
-      <p className="text-red-500">
-        Erro ao carregar tarefas: {error.message}
-      </p>
+      <p>Não foi possível carregar as tarefas.</p>
     );
   }
 
