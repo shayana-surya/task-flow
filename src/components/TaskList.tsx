@@ -5,6 +5,7 @@ import { trpc } from "@/utils/trpc";
 import { TaskItem } from "@/components/TaskItem";
 import { useNotification } from "./Notification";
 
+// Busca as tarefas e controla os estados de carregamento, erro e lista vazia.
 export function TaskList() {
   const { notify } = useNotification();
   const { data: tasks, isLoading, error } = trpc.task.list.useQuery();

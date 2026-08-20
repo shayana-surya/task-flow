@@ -1,4 +1,4 @@
-"use client";
+ "use client";
 
 import {
   createContext,
@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 
+// Disponibiliza notificações para os componentes e controla sua exibição e duração.
 type NotificationType = "error" | "warning" | "success";
 
 type Notification = {
@@ -21,6 +22,7 @@ type NotificationContextValue = {
   notify: (notification: Notification) => void;
 };
 
+// Cria um contexto para disponibilizar a função de notificação aos componentes
 const NotificationContext = createContext<NotificationContextValue | null>(null);
 
 const notificationColors: Record<NotificationType, string> = {
@@ -29,6 +31,7 @@ const notificationColors: Record<NotificationType, string> = {
   success: "#78A889",
 };
 
+// Fornece o sistema de notificações e controla sua exibição e duração
 export function NotificationProvider({
   children,
 }: {
@@ -37,6 +40,7 @@ export function NotificationProvider({
   const [notification, setNotification] = useState<Notification | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
+    // Exibe uma notificação e agenda sua remoção após 4 segundos
   const notify = useCallback((nextNotification: Notification) => {
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
@@ -59,6 +63,7 @@ export function NotificationProvider({
     };
   }, []);
 
+  // Permite fechar a notificação manualmente
   const dismiss = useCallback(() => {
     if (timeoutRef.current) {
       window.clearTimeout(timeoutRef.current);
@@ -96,6 +101,7 @@ export function NotificationProvider({
   );
 }
 
+// Facilita o acesso ao contexto pelos componentes que precisam exibir notificações
 export function useNotification() {
   const context = useContext(NotificationContext);
 

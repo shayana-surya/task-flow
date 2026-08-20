@@ -5,6 +5,7 @@ import { TaskForm } from "./TaskForm";
 import { TaskList } from "./TaskList";
 import { NotificationProvider } from "./Notification";
 
+// Componente principal da tela, responsável por controlar o formulário e exibir a lista de tarefas.
 export function TaskBoard() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 

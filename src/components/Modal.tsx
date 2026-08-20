@@ -1,5 +1,7 @@
 "use client";
 
+// Componente reutilizável para exibir conteúdo em uma janela modal.
+
 type ModalProps = {
   title: string;
   onCloseAction: () => void;

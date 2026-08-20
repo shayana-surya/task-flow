@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Task Manager
 
-## Getting Started
+Aplicação web para gerenciamento de tarefas, desenvolvida com **Next.js, React, TypeScript e tRPC**.
 
-First, run the development server:
+## Tecnologias
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+* Next.js + React
+* TypeScript
+* tRPC
+* TanStack Query
+* Zod
+
+## Como funciona
+
+A aplicação permite **criar, visualizar, editar e excluir tarefas**.
+
+O frontend utiliza **tRPC** para se comunicar com o backend, compartilhando os tipos TypeScript entre as duas partes.
+
+```text
+React / Next.js
+      ↓
+    tRPC
+      ↓
+   Backend
+      ↓
+  Persistência
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## SOLID e DDD
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+O projeto aplica conceitos de **SOLID**, principalmente separação de responsabilidades e redução de acoplamento.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Também utiliza conceitos de **DDD** para separar as regras relacionadas ao domínio de tarefas da interface e da infraestrutura.
 
-## Learn More
+```text
+Interface
+   ↓
+Application
+   ↓
+Domain
+   ↓
+Infrastructure
+```
 
-To learn more about Next.js, take a look at the following resources:
+Por ser um projeto de pequeno porte, foi utilizada uma abordagem simplificada de DDD, com foco na organização e separação das responsabilidades.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Como executar
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm install
+npm run dev
+```
 
-## Deploy on Vercel
+Acesse `http://localhost:3000`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Objetivo
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este projeto foi desenvolvido como parte de uma **etapa técnica de processo seletivo**, com o objetivo de demonstrar conhecimentos em **desenvolvimento full-stack, arquitetura, organização de código e tecnologias do ecossistema Next.js/TypeScript**.
+
+Também serviu como oportunidade para aplicar conceitos de **SOLID, DDD e tRPC**, relacionando-os aos conhecimentos prévios em **C# e ASP.NET Core**.

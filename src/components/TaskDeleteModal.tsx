@@ -2,6 +2,8 @@
 
 import { Modal } from "./Modal";
 
+// Exibe uma confirmação antes de excluir uma tarefa.
+
 type TaskDeleteModalProps = {
   taskTitle: string;
   onCancelAction: () => void;

@@ -1,6 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import { useNotification } from "@/components/Notification";
 
+// Reúne utilitários usados pelas mutations de tarefa
 function useTaskUtils() {
   const utils = trpc.useUtils();
   const { notify } = useNotification();
@@ -8,6 +9,7 @@ function useTaskUtils() {
   return { utils, notify };
 }
 
+// Padroniza o comportamento de sucesso e erro das mutations
 function useTaskMutationFeedback(
   successMessage: string,
   errorPrefix: string
@@ -16,6 +18,7 @@ function useTaskMutationFeedback(
 
   return {
     onSuccess: () => {
+      // Busca a lista novamente para mostrar a alteração na tela.
       utils.task.list.invalidate();
       notify({ type: "success", message: successMessage });
     },

@@ -11,6 +11,8 @@ import { useNotification } from "./Notification";
 import { Modal } from "./Modal";
 import { TaskDeleteModal } from "./TaskDeleteModal";
 
+// Exibe uma tarefa e controla as ações de editar e excluir
+
 type RouterOutput = inferRouterOutputs<AppRouter>;
 type Task = RouterOutput["task"]["list"][number];
 

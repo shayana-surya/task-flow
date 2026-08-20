@@ -5,7 +5,11 @@ import type {
   UpdateTaskData,
 } from "../domain/task";
 
+// No DDD, esta camada concentra os casos de uso do negócio.
+// Ela não sabe como os dados são guardados; apenas usa o contrato do repositório.
+
 export class TaskService {
+  // Receber uma abstração deixa o serviço fácil de testar e segue a inversão de dependência do SOLID.
   constructor(private readonly repository: TaskRepository) {}
 
   list(): Task[] {
@@ -13,6 +17,7 @@ export class TaskService {
   }
 
   create(data: CreateTaskData): Task {
+    // Limpamos os textos aqui para manter os dados consistentes, mesmo que outro cliente use a API.
     return this.repository.create({
       title: data.title.trim(),
       description: data.description?.trim() || undefined,
@@ -20,6 +25,7 @@ export class TaskService {
   }
 
   update(data: UpdateTaskData): Task {
+    // Repetimos a limpeza na edição para manter o mesmo padrão da criação.
     return this.repository.update({
       id: data.id,
       title: data.title.trim(),

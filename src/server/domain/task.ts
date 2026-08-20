@@ -1,3 +1,6 @@
+// No DDD, o domínio representa o que é importante para o negócio.
+// Aqui, Task descreve os dados que uma tarefa precisa ter.
+
 export type Task = {
   id: number;
   title: string;
